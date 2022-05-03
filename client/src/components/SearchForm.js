@@ -3,7 +3,7 @@ import ListenService from "../services/ListenService";
 import { AudioContext } from "../index";
 import utf8 from "utf8";
 
-function ListenForm() {
+function SearchForm() {
   const [url, setUrl] = useState("");
   const { audio } = useContext(AudioContext);
 
@@ -34,24 +34,10 @@ function ListenForm() {
           }
         }}
       >
-        Play
-      </button>
-      <button
-        onClick={() => {
-          audio.pause();
-        }}
-      >
-        Pause
-      </button>
-      <button
-        onClick={() => {
-          audio.stop();
-        }}
-      >
-        Stop
+        Search
       </button>
     </div>
   );
 }
 
-export default ListenForm;
+export default SearchForm;

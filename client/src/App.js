@@ -1,8 +1,9 @@
 import { useContext, useEffect } from "react";
 import { Context } from "./index";
 import LoginForm from "./components/LoginForm";
-import UsersForm from "./components/UsersForm";
-import ListenForm from "./components/ListenForm";
+import SearchForm from "./components/SearchForm";
+import PlaylistForm from "./components/PlaylistForm";
+import PlayerForm from "./components/PlayerForm";
 import { observer } from "mobx-react-lite";
 
 function App() {
@@ -32,8 +33,9 @@ function App() {
     <div>
       <h1>{`Пользователь авторизован ${store.user.email}`}</h1>
       <button onClick={() => store.logout()}>Выйти</button>
-      <UsersForm />
-      <ListenForm />
+      <SearchForm />
+      <PlaylistForm />
+      <PlayerForm />
     </div>
   );
 }

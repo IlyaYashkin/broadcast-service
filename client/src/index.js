@@ -3,11 +3,16 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Store from "./store/store";
+import Audio from "./store/audio";
 
 const store = new Store();
+const audio = new Audio();
 
 export const Context = createContext({
   store,
+});
+export const AudioContext = createContext({
+  audio,
 });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

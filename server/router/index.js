@@ -17,8 +17,8 @@ router.post("/logout", userController.logout);
 // router.get("/activate/:link", userController.activate);
 router.get("/refresh", userController.refresh);
 router.get("/users", authMiddleware, userController.getUsers);
-router.post("/playlist", authMiddleware, playlistController.addToPlaylist);
-router.get("/playlist", authMiddleware, playlistController.getPlaylistData);
-router.get("/listen", authMiddleware, ytdlController.download);
+router.post("/playlist", authMiddleware, playlistController.modifyPlaylist);
+router.get("/playlist", authMiddleware, playlistController.getPlaylist);
+router.get("/listen", authMiddleware, ytdlController.listen);
 
 module.exports = router;
