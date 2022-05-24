@@ -2,8 +2,8 @@ import React, { createContext } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import Store from "./store/store";
-import Audio from "./store/audio";
+import Store from "./contexts/store";
+import Audio from "./contexts/audio";
 
 const store = new Store();
 const audio = new Audio();
@@ -21,6 +21,7 @@ root.render(
   <Context.Provider
     value={{
       store,
+      audio,
     }}
   >
     <App />

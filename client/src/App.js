@@ -1,9 +1,11 @@
 import { useContext, useEffect } from "react";
 import { Context } from "./index";
 import LoginForm from "./components/LoginForm";
-import SearchForm from "./components/SearchForm";
-import PlaylistForm from "./components/PlaylistForm";
-import PlayerForm from "./components/PlayerForm";
+import InitialForm from "./components/InitialForm";
+import RegistrationForm from "./components/RegistrationForm";
+import MainForm from "./components/MainForm";
+import CreateRoomForm from "./components/CreateRoomForm";
+import RoomForm from "./components/RoomForm";
 import { observer } from "mobx-react-lite";
 
 function App() {
@@ -19,25 +21,29 @@ function App() {
     return <div>Загрузка...</div>;
   }
 
-  if (!store.isAuth) {
-    // return <LoginForm />;
-    return (
-      <div>
-        <h1>Авторизуйтесь</h1>
-        <LoginForm />
-      </div>
-    );
+  if (store.state === "main-form") {
+    return <MainForm />;
   }
 
-  return (
-    <div>
-      <h1>{`Пользователь авторизован ${store.user.email}`}</h1>
-      <button onClick={() => store.logout()}>Выйти</button>
-      <SearchForm />
-      <PlaylistForm />
-      <PlayerForm />
-    </div>
-  );
+  if (store.state === "login-form") {
+    return <LoginForm />;
+  }
+
+  if (store.state === "registration-form") {
+    return <RegistrationForm />;
+  }
+
+  if (store.state === "create-room-form") {
+    return <CreateRoomForm />;
+  }
+
+  if (store.state === "room-form") {
+    return <RoomForm />;
+  }
+
+  if (store.state === "initial-form") {
+    return <InitialForm />;
+  }
 }
 
 export default observer(App);

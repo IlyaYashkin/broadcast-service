@@ -8,6 +8,7 @@ function LoginForm() {
   const { store } = useContext(Context);
   return (
     <div>
+      <h1>Авторизация</h1>
       <input
         onChange={(e) => setEmail(e.target.value)}
         value={email}
@@ -20,12 +21,12 @@ function LoginForm() {
         type="password"
         placeholder="Password"
       />
-      <button onClick={() => store.login(email, password)}>Логин</button>
-      <button onClick={() => store.registration(email, password)}>
-        Регистрация
+      <button onClick={() => store.login(email, password)}>
+        Авторизоваться
       </button>
+      <button onClick={() => store.setState("initial-form")}>Назад</button>
     </div>
   );
 }
 
-export default observer(LoginForm);
+export default LoginForm;

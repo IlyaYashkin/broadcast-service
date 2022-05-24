@@ -1,4 +1,4 @@
-const userService = require("../service/user-service");
+const userService = require("../services/user-service");
 const { validationResult } = require("express-validator");
 const ApiError = require("../exceptions/api-error");
 
@@ -11,13 +11,20 @@ class UserController {
           ApiError.BadRequest("Ошибка при валидации", errors.array())
         );
       }
-      const { email, password } = req.body;
-      const userData = await userService.registration(email, password);
+      const { username, email, password } = req.body;
+      const userData = await userService.registration(
+        username,
+        email,
+        password
+      );
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.json(userData);
+      return res.json({
+        accessToken: userData.accessToken,
+        user: userData.user,
+      });
     } catch (e) {
       next(e);
     }
@@ -31,7 +38,10 @@ class UserController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.json(userData);
+      return res.json({
+        accessToken: userData.accessToken,
+        user: userData.user,
+      });
     } catch (e) {
       next(e);
     }
@@ -48,11 +58,6 @@ class UserController {
     }
   }
 
-  async activate(req, res, next) {
-    try {
-    } catch (e) {}
-  }
-
   async refresh(req, res, next) {
     try {
       const { refreshToken } = req.cookies;
@@ -61,16 +66,10 @@ class UserController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.json(userData);
-    } catch (e) {
-      next(e);
-    }
-  }
-
-  async getUsers(req, res, next) {
-    try {
-      const users = await userService.getAllUsers();
-      return res.json(users);
+      return res.json({
+        accessToken: userData.accessToken,
+        user: userData.user,
+      });
     } catch (e) {
       next(e);
     }

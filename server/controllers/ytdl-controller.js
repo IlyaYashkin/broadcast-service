@@ -1,5 +1,5 @@
 const ApiError = require("../exceptions/api-error");
-const ytdlService = require("../service/ytdl-service");
+const ytdlService = require("../services/ytdl-service");
 const utf8 = require("utf8");
 
 class YtdlController {
@@ -15,7 +15,6 @@ class YtdlController {
         "Content-Length": data.fileInfo.size,
         "Media-Title": utf8.encode(data.mediaInfo.title),
       });
-
       data.stream.pipe(res);
     } catch (e) {
       next(e);
