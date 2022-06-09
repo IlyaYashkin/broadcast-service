@@ -1,5 +1,6 @@
 const { rooms, io } = require("../index");
 const ytdlp = require("yt-dlp-exec");
+const ytsr = require("ytsr");
 const FFmpeg = require("fluent-ffmpeg");
 const Throttle = require("throttle");
 const fs = require("fs");
@@ -37,23 +38,46 @@ class BroadcastService {
     try {
       const room = rooms.get(roomId);
       room.setState("downloading");
+      io.to(roomId).emit("broadcast-info", {
+        state: room.state,
+        title: "",
+      });
+
       const filePath = path.join(process.cwd(), "downloads", roomId);
 
-      await ytdlp.exec(url, {
-        f: "ba",
-        o: filePath,
-        noPlaylist: true,
-        forceOverwrites: true,
-      });
+      const [info] = await Promise.all([
+        ytdlp
+          .exec(url, {
+            dumpSingleJson: true,
+            f: "ba",
+          })
+          .then((data) => {
+            return JSON.parse(data.stdout);
+          }),
+        ytdlp.exec(url, {
+          f: "ba",
+          o: filePath,
+          noPlaylist: true,
+          forceOverwrites: true,
+        }),
+      ]);
 
       const that = this;
       play();
       function play() {
         room.setState("broadcasting");
+        io.to(roomId).emit("broadcast-info", {
+          state: room.state,
+          title: info.fulltitle,
+        });
         const throttle = new Throttle(16000); //bitrate = 128k / 8 Пропускная способность (байты/сек)
         const readable = fs.createReadStream(filePath);
         const ffmpeg = new FFmpeg(readable);
-        const formatted = ffmpeg.audioBitrate("128").format("mp3").pipe();
+        const formatted = ffmpeg
+          .audioBitrate("128")
+          .audioFrequency(48000)
+          .format("mp3")
+          .pipe();
         formatted.pipe(throttle);
 
         that.broadcasts.set(roomId, {
@@ -72,6 +96,7 @@ class BroadcastService {
           }
         });
         throttle.on("finish", () => {
+          console.log("FINISH");
           if (!rooms.has(roomId)) return;
           if (room.repeat) {
             setImmediate(play);
@@ -80,12 +105,20 @@ class BroadcastService {
             room.playlist.shift();
             if (room.playlist.length === 0) {
               room.setState("sleeping");
+              io.to(roomId).emit("broadcast-info", {
+                state: room.state,
+                title: "",
+              });
               return;
             }
+            setImmediate(() => {
+              that.download(room.playlist[0], roomId);
+            });
           }
         });
       }
     } catch (e) {
+      console.log(e);
       io.to(roomId).emit("server-message", {
         msg: "Неверный URL",
       });
@@ -95,6 +128,10 @@ class BroadcastService {
         room.playlist.shift();
         if (room.playlist.length === 0) {
           room.setState("sleeping");
+          io.to(roomId).emit("broadcast-info", {
+            state: room.state,
+            title: "",
+          });
           return;
         }
       }
@@ -115,13 +152,17 @@ class BroadcastService {
   }
 
   async deleteFile(roomId) {
-    const filePath = path.join(process.cwd(), "downloads", roomId);
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        return; //console.error(err);
-      }
-      //console.log('Файл удален');
-    });
+    try {
+      const filePath = path.join(process.cwd(), "downloads", roomId);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          return; //console.error(err);
+        }
+        //console.log('Файл удален');
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   playSilence() {

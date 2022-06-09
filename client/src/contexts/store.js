@@ -1,7 +1,7 @@
 import axios from "axios";
 import { makeAutoObservable } from "mobx";
 import AuthService from "../services/AuthService";
-import { API_URL } from "../connection";
+import { API_URL } from "../connection/http";
 import RoomService from "../services/RoomService";
 
 export default class Store {
@@ -45,6 +45,8 @@ export default class Store {
       case "create-room-form":
       case "room-form":
         this.state = state;
+        break;
+      default:
     }
   }
 

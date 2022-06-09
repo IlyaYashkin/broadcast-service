@@ -7,8 +7,13 @@ import PlayerForm from "./PlayerForm";
 
 function RoomForm() {
   const [command, setCommand] = useState("");
+  const [broadcastInfo, setBroadcastInfo] = useState({
+    state: "sleeping",
+    title: " ",
+  });
   const [chat, setChat] = useState([]);
   const [serverMsg, setServerMsg] = useState([]);
+  const [searchResult, setSearchResult] = useState([]);
   const { store } = useContext(Context);
   const { audio } = useContext(AudioContext);
 
@@ -30,13 +35,24 @@ function RoomForm() {
       if (serverMsg > 50) {
         serverMsg.pop();
       }
-      serverMsg.unshift(data);
+      console.log(data);
+      serverMsg.unshift(`SERVER: ${data.msg}`);
+      if (data.searchResult) {
+        setSearchResult(data.searchResult);
+      }
       const newServerMsg = [...serverMsg];
       setServerMsg(newServerMsg);
     });
+    store.socket.on("broadcast-info", (data) => {
+      setBroadcastInfo(data);
+    });
   }, []);
 
-  function sendCommand() {
+  function sendCommand(specificCommand = null) {
+    if (specificCommand) {
+      store.socket.emit("message", { msg: specificCommand });
+      return;
+    }
     if (command.length === 0) return;
     if (command.length > 200) {
       alert("Сообщение слишком длинное! (>200 символов)");
@@ -49,6 +65,10 @@ function RoomForm() {
   return (
     <div>
       <PlayerForm />
+      <div>
+        <div>Статус: {broadcastInfo.state}</div>
+        <div>Сейчас играет: {broadcastInfo.title}</div>
+      </div>
       <div>
         <input
           onKeyDown={(e) => {
@@ -64,8 +84,16 @@ function RoomForm() {
           placeholder="Команда"
         ></input>
         <button onClick={() => sendCommand()}>Отправить</button>
+        <button
+          onClick={() => {
+            store.socket.disconnect();
+            store.leaveRoom();
+            audio.stop();
+          }}
+        >
+          Назад
+        </button>
       </div>
-
       <div
         style={{
           display: "inline-flex",
@@ -90,27 +118,32 @@ function RoomForm() {
         <div
           style={{
             height: 470,
-            width: 300,
+            width: 600,
             border: "1px solid",
             wordWrap: "break-word",
             overflowY: "scroll",
           }}
         >
           {serverMsg.map((data, index) => (
-            <div key={index}>SERVER: {data.msg}</div>
+            <div key={index}>{data}</div>
+          ))}
+        </div>
+        <div>
+          {searchResult.map((data, index) => (
+            <div key={index}>
+              <a
+                href="#"
+                onClick={() => {
+                  sendCommand(`!url ${data.url}`);
+                  setSearchResult([]);
+                }}
+              >
+                {index + 1}.{data.title}
+              </a>
+            </div>
           ))}
         </div>
       </div>
-
-      <button
-        onClick={() => {
-          store.socket.disconnect();
-          store.leaveRoom();
-          audio.stop();
-        }}
-      >
-        Назад
-      </button>
     </div>
   );
 }

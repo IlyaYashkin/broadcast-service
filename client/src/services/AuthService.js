@@ -1,4 +1,4 @@
-import $api from "../connection";
+import $api from "../connection/http";
 
 export default class AuthService {
   static async login(email, password) {

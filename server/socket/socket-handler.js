@@ -1,5 +1,6 @@
 const maps = require("../index");
 const broadcastService = require("../services/broadcast-service");
+const ytdlService = require("../services/ytdl-service");
 
 class SocketHandler {
   onMessage(data) {
@@ -12,7 +13,7 @@ class SocketHandler {
       });
       return;
     }
-    // console.log(`${socket.command[0]}: ${socket.command[1]}`);
+    console.log(`${socket.command[0]}: ${socket.command[1]}`);
     const room = maps.rooms.get(socket.info.roomId);
     switch (socket.command[0]) {
       case "url":
@@ -39,6 +40,14 @@ class SocketHandler {
         broadcastService.terminate(socket.info.roomId);
         io.to(socket.info.roomId).emit("server-message", {
           msg: `Пользователь ${socket.info.user.username} пропустил текущую запись`,
+        });
+        break;
+      case "search":
+        ytdlService.search(socket.command[1]).then((result) => {
+          socket.emit("server-message", {
+            msg: `Результат поиска по запросу -- "${socket.command[1]}"`,
+            searchResult: result,
+          });
         });
         break;
     }

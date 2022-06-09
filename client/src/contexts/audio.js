@@ -1,5 +1,5 @@
 import { Howl } from "howler";
-import { API_URL } from "../connection/index";
+import { API_URL } from "../connection/http";
 import { makeAutoObservable } from "mobx";
 
 export default class Audio {
@@ -13,14 +13,11 @@ export default class Audio {
   setState(state) {
     switch (state) {
       case "loading":
-        this.state = state;
-        break;
       case "playing":
-        this.state = state;
-        break;
       case "sleeping":
         this.state = state;
         break;
+      default:
     }
   }
 

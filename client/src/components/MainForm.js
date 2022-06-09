@@ -1,6 +1,5 @@
 import { useContext, useState } from "react";
 import { Context } from "../index";
-import { observer } from "mobx-react-lite";
 import RoomListForm from "./RoomListForm";
 
 function MainForm() {

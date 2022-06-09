@@ -21,28 +21,19 @@ function App() {
     return <div>Загрузка...</div>;
   }
 
-  if (store.state === "main-form") {
-    return <MainForm />;
-  }
-
-  if (store.state === "login-form") {
-    return <LoginForm />;
-  }
-
-  if (store.state === "registration-form") {
-    return <RegistrationForm />;
-  }
-
-  if (store.state === "create-room-form") {
-    return <CreateRoomForm />;
-  }
-
-  if (store.state === "room-form") {
-    return <RoomForm />;
-  }
-
-  if (store.state === "initial-form") {
-    return <InitialForm />;
+  switch (store.state) {
+    case "main-form":
+      return <MainForm />;
+    case "login-form":
+      return <LoginForm />;
+    case "registration-form":
+      return <RegistrationForm />;
+    case "create-room-form":
+      return <CreateRoomForm />;
+    case "room-form":
+      return <RoomForm />;
+    case "initial-form":
+      return <InitialForm />;
   }
 }
 
